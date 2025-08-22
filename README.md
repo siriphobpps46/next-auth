@@ -5,12 +5,13 @@
 ## ✨ คุณสมบัติหลัก
 
 - 🔐 **ระบบความปลอดภัย**: การยืนยันตัวตนด้วย JWT Token
-- 👥 **จัดการผู้ใช้**: จัดการข้อมูลผู้ใช้ การกำหนดบทบาท และการติดตามการใช้งาน
+- 👥 **จัดการผู้ใช้แบบ CRUD**: เพิ่ม แก้ไข ลบ และดูข้อมูลผู้ใช้
 - 📊 **แดชบอร์ด**: แสดงข้อมูลสำคัญและสถิติการใช้งาน
 - 🎨 **UI ที่สวยงาม**: ใช้ธีมสี Navy Blue และ White พร้อม Font Kanit
 - 📱 **Responsive Design**: รองรับทุกขนาดหน้าจอ
 - 🔒 **ระบบสิทธิ์**: แยกสิทธิ์ระหว่าง Admin และ User
 - 🔔 **Toast Notifications**: การแจ้งเตือนที่ทันสมัยและสวยงาม
+- 🎯 **Sakai Theme**: ใช้ PrimeReact Sakai theme สำหรับการจัดการข้อมูล
 
 ## 🎨 ธีมการออกแบบ
 
@@ -30,6 +31,8 @@
 - **Buttons**: Hover effects และ Transitions
 - **Icons**: PrimeIcons ที่สอดคล้องกับธีม
 - **Toast**: การแจ้งเตือนที่ทันสมัยและ responsive
+- **DataTable**: ตารางข้อมูลที่สวยงามพร้อมฟีเจอร์ครบครัน
+- **Dialog**: Modal forms สำหรับการจัดการข้อมูล
 
 ## 🚀 การติดตั้ง
 
@@ -59,7 +62,7 @@ http://localhost:3000
 ### ผู้ดูแลระบบ (Admin)
 - **Username**: `admin`
 - **Password**: `123`
-- **สิทธิ์**: เข้าถึงทุกฟีเจอร์ รวมถึงหน้า Admin
+- **สิทธิ์**: เข้าถึงทุกฟีเจอร์ รวมถึงหน้า Admin และ User Management CRUD
 
 ### ผู้ใช้ทั่วไป (User)
 - **Username**: `user`
@@ -72,6 +75,11 @@ http://localhost:3000
 src/
 ├── app/
 │   ├── admin/          # หน้า Admin (สำหรับผู้ดูแลระบบ)
+│   │   ├── components/ # Components สำหรับ User Management
+│   │   │   ├── UserForm.tsx        # ฟอร์มเพิ่ม/แก้ไขผู้ใช้
+│   │   │   ├── UserTable.tsx       # ตารางแสดงข้อมูลผู้ใช้
+│   │   │   └── DeleteConfirmation.tsx # ยืนยันการลบผู้ใช้
+│   │   └── page.tsx    # หน้า Admin หลัก
 │   ├── api/            # API Routes
 │   │   └── auth/       # Authentication APIs
 │   ├── dashboard/      # หน้าแดชบอร์ด
@@ -88,12 +96,13 @@ src/
 ## 🛠️ เทคโนโลยีที่ใช้
 
 - **Frontend**: Next.js 15, React 19, TypeScript
-- **UI Components**: PrimeReact 10
+- **UI Components**: PrimeReact 10 (Sakai Theme)
 - **Styling**: Tailwind CSS 4
 - **Icons**: PrimeIcons
 - **Authentication**: JWT Token
 - **Font**: Kanit (Google Fonts)
 - **Notifications**: PrimeReact Toast
+- **Data Management**: PrimeReact DataTable, Dialog, Dropdown
 
 ## 📱 Responsive Design
 
@@ -146,6 +155,22 @@ src/
 - ✅ CSS variables สำหรับ font family
 - ✅ Tailwind CSS integration
 
+### User Management CRUD
+- ✅ **Create**: เพิ่มผู้ใช้ใหม่พร้อมฟอร์มที่ครบถ้วน
+- ✅ **Read**: แสดงข้อมูลผู้ใช้ในตารางที่สวยงาม
+- ✅ **Update**: แก้ไขข้อมูลผู้ใช้แบบ inline
+- ✅ **Delete**: ลบผู้ใช้พร้อมการยืนยัน
+- ✅ **Search & Filter**: ค้นหาและกรองข้อมูลตามบทบาท/สถานะ
+- ✅ **Status Management**: เปลี่ยนสถานะผู้ใช้แบบ real-time
+- ✅ **Role-based Access**: จำกัดการเข้าถึงตามบทบาท
+
+### Sakai Theme Integration
+- ✅ ใช้ PrimeReact Sakai theme
+- ✅ ปรับแต่ง Dialog และ DataTable styling
+- ✅ Enhanced form components
+- ✅ Improved table interactions
+- ✅ Better visual feedback
+
 ## 🔧 การปรับแต่ง
 
 ### เปลี่ยนธีมสี
@@ -179,7 +204,7 @@ const kanit = Kanit({
 
 ```typescript
 // เปลี่ยนจาก
-import "primereact/resources/themes/lara-light-blue/theme.css";
+import "primereact/resources/themes/saga-blue/theme.css";
 
 // เป็น
 import "primereact/resources/themes/lara-light-indigo/theme.css";
@@ -201,6 +226,22 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 }
 ```
 
+### การปรับแต่ง DataTable
+แก้ไขไฟล์ `src/app/globals.css`:
+
+```css
+.p-datatable .p-datatable-header {
+  background: var(--accent);
+  border-radius: 12px 12px 0 0;
+  padding: 1.5rem;
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: var(--accent);
+  transform: scale(1.01);
+}
+```
+
 ## 📊 Performance
 
 - **Lighthouse Score**: 90+ (Performance, Accessibility, Best Practices)
@@ -208,6 +249,7 @@ import "primereact/resources/themes/lara-light-indigo/theme.css";
 - **Image Optimization**: Next.js Image component
 - **Code Splitting**: Automatic route-based splitting
 - **Font Loading**: Optimized with preload และ display swap
+- **Component Lazy Loading**: Components โหลดเมื่อจำเป็น
 
 ## 🚀 Deployment
 
@@ -265,15 +307,15 @@ const showToast = (severity: 'success' | 'error' | 'warn' | 'info', summary: str
 showToast('success', 'สำเร็จ', 'ดำเนินการเสร็จสิ้น');
 ```
 
-### 3. เพิ่ม Component ใหม่
+### 3. เพิ่ม User Management Component
 ```typescript
-// src/components/NewComponent.tsx
-interface NewComponentProps {
+// src/app/admin/components/NewUserComponent.tsx
+interface NewUserComponentProps {
   title: string;
   children: React.ReactNode;
 }
 
-export default function NewComponent({ title, children }: NewComponentProps) {
+export default function NewUserComponent({ title, children }: NewUserComponentProps) {
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
       <h3 className="text-lg font-semibold text-slate-800 mb-4">{title}</h3>
@@ -281,6 +323,24 @@ export default function NewComponent({ title, children }: NewComponentProps) {
     </div>
   );
 }
+```
+
+### 4. เพิ่มฟีเจอร์ใหม่ใน User Management
+```typescript
+// เพิ่มฟีเจอร์ Bulk Actions
+const handleBulkDelete = (selectedUsers: User[]) => {
+  // ลบผู้ใช้หลายคนพร้อมกัน
+};
+
+// เพิ่มฟีเจอร์ Export Data
+const handleExportData = (format: 'csv' | 'excel' | 'pdf') => {
+  // ส่งออกข้อมูลในรูปแบบต่างๆ
+};
+
+// เพิ่มฟีเจอร์ Import Data
+const handleImportData = (file: File) => {
+  // นำเข้าข้อมูลจากไฟล์
+};
 ```
 
 ## 🧪 การทดสอบ
@@ -300,11 +360,27 @@ npm run test:e2e
 npm run test:visual
 ```
 
+### 4. User Management Tests
+```bash
+# ทดสอบการเพิ่มผู้ใช้
+npm run test:user-create
+
+# ทดสอบการแก้ไขผู้ใช้
+npm run test:user-update
+
+# ทดสอบการลบผู้ใช้
+npm run test:user-delete
+
+# ทดสอบการค้นหาและกรอง
+npm run test:user-search
+```
+
 ## 📚 ทรัพยากรเพิ่มเติม
 
 ### Documentation
 - [Next.js Documentation](https://nextjs.org/docs)
 - [PrimeReact Documentation](https://primereact.org/)
+- [PrimeReact Sakai Theme](https://primereact.org/sakai-react/)
 - [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
 
@@ -312,6 +388,7 @@ npm run test:visual
 - [Chrome DevTools](https://developers.google.com/web/tools/chrome-devtools)
 - [Lighthouse](https://developers.google.com/web/tools/lighthouse)
 - [WebPageTest](https://www.webpagetest.org/)
+- [PrimeReact Theme Builder](https://primereact.org/theme-builder/)
 
 ### Community
 - [Next.js Discord](https://discord.gg/nextjs)

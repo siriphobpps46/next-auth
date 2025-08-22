@@ -3,31 +3,38 @@
 import { useState, useEffect, useRef } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Tag } from "primereact/tag";
 import { Avatar } from "primereact/avatar";
 import { Divider } from "primereact/divider";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useRouter } from "next/navigation";
-import "primereact/resources/themes/lara-light-blue/theme.css";
+import UserForm from "./components/UserForm";
+import UserTable from "./components/UserTable";
+import DeleteConfirmation from "./components/DeleteConfirmation";
+import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 
 interface User {
+  id: string;
   username: string;
-  role: string;
+  password?: string;
   name: string;
   email: string;
+  role: string;
   status: string;
   lastLogin: string;
+  createdAt: string;
 }
 
 export default function AdminPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [formMode, setFormMode] = useState<'create' | 'edit'>('create');
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const toast = useRef<Toast>(null);
   const router = useRouter();
 
@@ -70,62 +77,107 @@ export default function AdminPage() {
     // Mock data for demonstration
     const mockUsers: User[] = [
       {
+        id: "1",
         username: "admin",
-        role: "admin",
         name: "Administrator",
         email: "admin@example.com",
+        role: "admin",
         status: "active",
-        lastLogin: "2024-01-15 10:30:00"
+        lastLogin: "2024-01-15 10:30:00",
+        createdAt: "2024-01-01 00:00:00"
       },
       {
+        id: "2",
         username: "user",
-        role: "user",
         name: "Regular User",
         email: "user@example.com",
+        role: "user",
         status: "active",
-        lastLogin: "2024-01-14 15:45:00"
+        lastLogin: "2024-01-14 15:45:00",
+        createdAt: "2024-01-02 00:00:00"
       },
       {
+        id: "3",
         username: "manager",
-        role: "user",
         name: "Manager User",
         email: "manager@example.com",
+        role: "manager",
+        status: "active",
+        lastLogin: "2024-01-13 09:20:00",
+        createdAt: "2024-01-03 00:00:00"
+      },
+      {
+        id: "4",
+        username: "testuser",
+        name: "Test User",
+        email: "test@example.com",
+        role: "user",
         status: "inactive",
-        lastLogin: "2024-01-10 09:20:00"
+        lastLogin: "2024-01-10 14:30:00",
+        createdAt: "2024-01-04 00:00:00"
+      },
+      {
+        id: "5",
+        username: "support",
+        name: "Support Staff",
+        email: "support@example.com",
+        role: "user",
+        status: "suspended",
+        lastLogin: "2024-01-08 11:15:00",
+        createdAt: "2024-01-05 00:00:00"
       }
     ];
     setUsers(mockUsers);
   };
 
-  const getStatusSeverity = (status: string) => {
-    return status === "active" ? "success" : "danger";
+  const handleCreateUser = () => {
+    setFormMode('create');
+    setEditingUser(null);
+    setShowUserForm(true);
   };
 
-  const getRoleSeverity = (role: string) => {
-    return role === "admin" ? "danger" : "info";
+  const handleEditUser = (user: User) => {
+    setFormMode('edit');
+    setEditingUser(user);
+    setShowUserForm(true);
   };
 
-  const actionTemplate = (rowData: User) => {
-    return (
-      <div className="flex space-x-2">
-        <Button
-          icon="pi pi-pencil"
-          size="small"
-          severity="secondary"
-          tooltip="แก้ไข"
-          className="btn-hover"
-          onClick={() => showToast('info', 'ข้อมูล', `กำลังแก้ไขผู้ใช้: ${rowData.name}`)}
-        />
-        <Button
-          icon="pi pi-trash"
-          size="small"
-          severity="danger"
-          tooltip="ลบ"
-          className="btn-hover"
-          onClick={() => showToast('warn', 'คำเตือน', `คุณต้องการลบผู้ใช้: ${rowData.name}?`)}
-        />
-      </div>
-    );
+  const handleDeleteUser = (userId: string) => {
+    setDeletingUserId(userId);
+    // จำลองการลบ
+    setTimeout(() => {
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      setDeletingUserId(null);
+      showToast('success', 'สำเร็จ', 'ลบผู้ใช้สำเร็จ');
+    }, 1000);
+  };
+
+  const handleStatusChange = (userId: string, newStatus: string) => {
+    setUsers(prev => prev.map(u => 
+      u.id === userId ? { ...u, status: newStatus } : u
+    ));
+    showToast('success', 'สำเร็จ', 'อัปเดตสถานะผู้ใช้สำเร็จ');
+  };
+
+  const handleSaveUser = (userData: User) => {
+    if (formMode === 'create') {
+      // เพิ่มผู้ใช้ใหม่
+      const newUser: User = {
+        ...userData,
+        id: Date.now().toString(),
+        createdAt: new Date().toLocaleString('th-TH'),
+        lastLogin: '-'
+      };
+      setUsers(prev => [newUser, ...prev]);
+      showToast('success', 'สำเร็จ', 'เพิ่มผู้ใช้ใหม่สำเร็จ');
+    } else {
+      // อัปเดตผู้ใช้
+      setUsers(prev => prev.map(u => 
+        u.id === editingUser?.id ? { ...u, ...userData } : u
+      ));
+      showToast('success', 'สำเร็จ', 'อัปเดตผู้ใช้สำเร็จ');
+    }
+    setShowUserForm(false);
   };
 
   if (loading) {
@@ -242,7 +294,7 @@ export default function AdminPage() {
           </Card>
         </div>
 
-        {/* Users Management */}
+        {/* User Management */}
         <Card className="shadow-lg border-0 bg-white mb-8">
           <div className="p-6 md:p-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 space-y-3 sm:space-y-0">
@@ -252,53 +304,16 @@ export default function AdminPage() {
                 icon="pi pi-plus"
                 severity="success"
                 className="btn-hover w-full sm:w-auto"
-                onClick={() => showToast('info', 'ข้อมูล', 'กำลังเพิ่มผู้ใช้ใหม่...')}
+                onClick={handleCreateUser}
               />
             </div>
             
-            <div className="overflow-x-auto">
-              <DataTable 
-                value={users} 
-                paginator 
-                rows={5}
-                rowsPerPageOptions={[5, 10, 25]}
-                className="p-datatable-sm"
-                emptyMessage="ไม่พบข้อมูลผู้ใช้"
-                stripedRows
-                showGridlines={false}
-                responsiveLayout="scroll"
-              >
-                <Column field="username" header="ชื่อผู้ใช้" sortable className="min-w-[120px]" />
-                <Column field="name" header="ชื่อ" sortable className="min-w-[150px]" />
-                <Column field="email" header="อีเมล" sortable className="min-w-[200px]" />
-                <Column 
-                  field="role" 
-                  header="บทบาท" 
-                  sortable
-                  className="min-w-[120px]"
-                  body={(rowData) => (
-                    <Tag 
-                      value={rowData.role === "admin" ? "ผู้ดูแลระบบ" : "ผู้ใช้ทั่วไป"}
-                      severity={getRoleSeverity(rowData.role)}
-                    />
-                  )}
-                />
-                <Column 
-                  field="status" 
-                  header="สถานะ" 
-                  sortable
-                  className="min-w-[100px]"
-                  body={(rowData) => (
-                    <Tag 
-                      value={rowData.status === "active" ? "ใช้งาน" : "ไม่ใช้งาน"}
-                      severity={getStatusSeverity(rowData.status)}
-                    />
-                  )}
-                />
-                <Column field="lastLogin" header="เข้าสู่ระบบล่าสุด" sortable className="min-w-[180px]" />
-                <Column header="การดำเนินการ" body={actionTemplate} className="min-w-[120px]" />
-              </DataTable>
-            </div>
+            <UserTable
+              users={users}
+              onEdit={handleEditUser}
+              onDelete={handleDeleteUser}
+              onStatusChange={handleStatusChange}
+            />
           </div>
         </Card>
 
@@ -314,7 +329,7 @@ export default function AdminPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center py-2 border-b border-slate-100">
                       <span className="text-slate-600">เวอร์ชัน:</span>
-                      <span className="font-medium text-slate-800">1.0.0</span>
+                      <span className="font-medium text-slate-800">2.0.0</span>
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-slate-100">
                       <span className="text-slate-600">สถานะ:</span>
@@ -327,17 +342,25 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-semibold text-slate-700 mb-4 text-lg">การบำรุงรักษา</h4>
-                  <p className="text-slate-600 leading-relaxed mb-4">
-                    ระบบจะมีการบำรุงรักษาเป็นประจำทุกสัปดาห์
-                    กรุณาตรวจสอบประกาศล่วงหน้าก่อนการบำรุงรักษา
-                  </p>
-                  <div className="p-4 bg-amber-50 rounded-xl border border-amber-200">
-                    <p className="text-sm text-amber-800">
-                      <i className="pi pi-exclamation-triangle mr-2"></i>
-                      การบำรุงรักษาถัดไป: วันอาทิตย์ที่ 21 มกราคม 2024 เวลา 02:00-04:00 น.
-                    </p>
-                  </div>
+                  <h4 className="font-semibold text-slate-700 mb-4 text-lg">ฟีเจอร์ใหม่</h4>
+                  <ul className="space-y-2 text-sm text-slate-600">
+                    <li className="flex items-center space-x-2">
+                      <i className="pi pi-check-circle text-green-500"></i>
+                      <span>ระบบจัดการผู้ใช้แบบ CRUD</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <i className="pi pi-check-circle text-green-500"></i>
+                      <span>การค้นหาและกรองข้อมูล</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <i className="pi pi-check-circle text-green-500"></i>
+                      <span>การจัดการสถานะผู้ใช้</span>
+                    </li>
+                    <li className="flex items-center space-x-2">
+                      <i className="pi pi-check-circle text-green-500"></i>
+                      <span>การยืนยันการลบข้อมูล</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -372,7 +395,7 @@ export default function AdminPage() {
                   severity="secondary"
                   outlined
                   onClick={() => {
-                    window.location.reload();
+                    loadMockUsers();
                     showToast('info', 'ข้อมูล', 'กำลังรีเฟรชข้อมูล...');
                   }}
                   className="btn-hover"
@@ -382,6 +405,22 @@ export default function AdminPage() {
           </Card>
         </div>
       </div>
+
+      {/* User Form Dialog */}
+      <UserForm
+        visible={showUserForm}
+        onHide={() => setShowUserForm(false)}
+        user={editingUser}
+        onSave={handleSaveUser}
+        mode={formMode}
+      />
+
+      {/* Delete Confirmation */}
+      <DeleteConfirmation onConfirm={() => {
+        if (deletingUserId) {
+          handleDeleteUser(deletingUserId);
+        }
+      }} />
     </div>
   );
 }
