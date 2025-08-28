@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Kanit } from "next/font/google";
 import "./globals.css";
 import "primereact/resources/themes/saga-blue/theme.css";
@@ -18,7 +18,11 @@ export const metadata: Metadata = {
   description: "ระบบจัดการผู้ใช้ที่มีประสิทธิภาพ พร้อมระบบความปลอดภัยและการจัดการสิทธิ์ที่ครบครัน",
   keywords: ["user management", "authentication", "admin panel", "dashboard"],
   authors: [{ name: "Your Name" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
